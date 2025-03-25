@@ -21,26 +21,22 @@ function queryParams(req, res, next) {
 }
 
 function idValidation(req, res, next) {
-    // Change
     if (req.params.id) {
+        console.log(req.params.id)
         req.params.id = parseInt(req.params.id)
         return next()
     }
-    next()
 }
 
 function formValidation(req, res, next) {
-    // Add something
-    try {
-        const {task} = req.body
-        console.log(task)
-        if(!task) return res.json({status: 406, error: 'Field must be filled!'})
-        if (task.length > 10) return res.json({status: 406, error: 'Field must not exceed 10 characters'})
-        next()
-    } catch (error) {
-        console.error(error)
-        next()
-    }
+    if (typeof req.body === 'object' && !Array.isArray(req.body)) {
+        const { task } = req.body
+        if( !task ) return res.json({status: 406, error: 'Field must be filled!'})
+        if ( task.length > 10 ) return res.json({status: 406, error: 'Field must not exceed 10 characters'})
+        return next()
+    } else {
+        res.json({error: 'Invalid JSON'})
+    } 
 }
 
 app.get('/', queryParams, async (req, res) => {
@@ -81,8 +77,7 @@ app.get('/', queryParams, async (req, res) => {
 
 app.post('/', formValidation, async (req, res) => {
     const { task } = req.body
-    console.log(task)
- 
+
     const createTask = await prisma.task.create({
         data: {
             taskName: task,
@@ -95,7 +90,7 @@ app.post('/', formValidation, async (req, res) => {
 
 app.get('/:id', idValidation, async (req, res) => {
     const id = req.params.id
-    
+    if (!id) return res.json({error: 'Invalid ID'})
     const getTaskID = await prisma.task.findUnique({
         where: { id: id }
     })
@@ -106,7 +101,7 @@ app.get('/:id', idValidation, async (req, res) => {
 
 app.put('/:id', idValidation, formValidation, async (req, res) => {
     const id = req.params.id
-        
+    if (!id) return res.json({error: 'Invalid ID'})
     const getTaskID = await prisma.task.findUnique({
         where: { id: id }
     })
@@ -122,7 +117,6 @@ app.put('/:id', idValidation, formValidation, async (req, res) => {
 app.patch('/:id', idValidation, async (req, res) => {
     const id = req.params.id
     const { statusTask } = req.body
-
     const updateStatusTask = await prisma.task.update({
         where: { id: id },
         data: { status: statusTask },
