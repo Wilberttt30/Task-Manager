@@ -21,10 +21,13 @@ function queryParams(req, res, next) {
 }
 
 function idValidation(req, res, next) {
-    if (req.params.id) {
-        console.log(req.params.id)
-        req.params.id = parseInt(req.params.id)
-        return next()
+    if (typeof req.params.id) {
+        if (isNaN(req.params.id)) {
+            res.json({error: 'ID must be number'})
+        } else {
+            req.params.id = parseInt(req.params.id)
+            return next()
+        }
     }
 }
 
@@ -90,7 +93,6 @@ app.post('/', formValidation, async (req, res) => {
 
 app.get('/:id', idValidation, async (req, res) => {
     const id = req.params.id
-    if (!id) return res.json({error: 'Invalid ID'})
     const getTaskID = await prisma.task.findUnique({
         where: { id: id }
     })
@@ -101,7 +103,6 @@ app.get('/:id', idValidation, async (req, res) => {
 
 app.put('/:id', idValidation, formValidation, async (req, res) => {
     const id = req.params.id
-    if (!id) return res.json({error: 'Invalid ID'})
     const getTaskID = await prisma.task.findUnique({
         where: { id: id }
     })
