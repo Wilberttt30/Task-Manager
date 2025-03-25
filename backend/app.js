@@ -1,7 +1,7 @@
+const fs = require('fs')
 const express = require('express')
 const cors = require('cors')
 const { PrismaClient } = require('@prisma/client')
-const pino = require('pino-http')()
 
 const prisma = new PrismaClient()
 
@@ -10,7 +10,21 @@ const port = 3000
 
 app.use(cors())
 app.use(express.json())
-app.use(pino)
+app.use(logging)
+
+function logging(req, res, next) {
+    const date = new Date()
+    const formatDate = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.toDateString()}`
+
+    const log = `${req.method} "${req.url}" at ${formatDate}\n`
+
+    fs.appendFile('log.txt', log, err => {
+        if (err) {
+            console.error(err)
+        }
+    })
+    next()
+}
 
 function queryParams(req, res, next) {
     if (isNaN(req.query.page) || req.query.page == "" || isNaN(req.query.limit) || req.query.limit == "") {
@@ -21,13 +35,11 @@ function queryParams(req, res, next) {
 }
 
 function idValidation(req, res, next) {
-    if (typeof req.params.id) {
-        if (isNaN(req.params.id)) {
-            res.json({error: 'ID must be number'})
-        } else {
-            req.params.id = parseInt(req.params.id)
-            return next()
-        }
+    if (isNaN(req.params.id)) {
+        res.json({error: 'ID must be number'})
+    } else {
+        req.params.id = parseInt(req.params.id)
+        return next()
     }
 }
 
