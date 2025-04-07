@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 
 const app = express()
 const port = 3000
-
+aaa
 app.use(cors())
 app.use(express.json())
 app.use(logging)
