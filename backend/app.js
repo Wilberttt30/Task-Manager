@@ -1,15 +1,13 @@
 const fs = require('fs')
 const express = require('express')
-const cors = require('cors')
 const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
 const app = express()
 const port = 3000
-aaa
-app.use(cors())
-app.use(express.json())
+
+app.use(express.static('public'))
 app.use(logging)
 
 function logging(req, res, next) {
@@ -54,7 +52,7 @@ function formValidation(req, res, next) {
     } 
 }
 
-app.get('/', queryParams, async (req, res) => {
+app.get('/api', queryParams, async (req, res) => {
     const page = parseInt(req.query.page)
     const limit = parseInt(req.query.limit)
 
@@ -90,7 +88,7 @@ app.get('/', queryParams, async (req, res) => {
     res.status(200).send({ msg: 'Successfully Fetch Data', task: result })
 })
 
-app.post('/', formValidation, async (req, res) => {
+app.post('/api', formValidation, async (req, res) => {
     const { task } = req.body
 
     const createTask = await prisma.task.create({
@@ -103,7 +101,7 @@ app.post('/', formValidation, async (req, res) => {
     res.status(200).send({msg: 'Task Created', createdTask: createTask})
 })
 
-app.get('/:id', idValidation, async (req, res) => {
+app.get('/api/:id', idValidation, async (req, res) => {
     const id = req.params.id
     const getTaskID = await prisma.task.findUnique({
         where: { id: id }
@@ -113,7 +111,7 @@ app.get('/:id', idValidation, async (req, res) => {
     res.status(200).send({msg: 'ID Found', task: getTaskID})
 })
 
-app.put('/:id', idValidation, formValidation, async (req, res) => {
+app.put('/api/:id', idValidation, formValidation, async (req, res) => {
     const id = req.params.id
     const getTaskID = await prisma.task.findUnique({
         where: { id: id }
@@ -127,7 +125,7 @@ app.put('/:id', idValidation, formValidation, async (req, res) => {
 })
 
 // True false checklist
-app.patch('/:id', idValidation, async (req, res) => {
+app.patch('/api/:id', idValidation, async (req, res) => {
     const id = req.params.id
     const { statusTask } = req.body
     const updateStatusTask = await prisma.task.update({
@@ -138,7 +136,7 @@ app.patch('/:id', idValidation, async (req, res) => {
       res.status(200).send({msg: 'Status Updated', statusUpdate: updateStatusTask})
 })
 
-app.delete('/:id', idValidation, async (req, res) => {
+app.delete('/api/:id', idValidation, async (req, res) => {
     const id = req.params.id
 
     if (isNaN(id)) return res.status(400).send({error: 'ID must be number'})

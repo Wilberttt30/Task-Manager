@@ -3,3 +3,7 @@ POST "/" at 16:48:54 Tue Mar 25 2025
 GET "/?page=1&limit=5" at 16:48:54 Tue Mar 25 2025
 DELETE "/34" at 16:48:55 Tue Mar 25 2025
 GET "/?page=1&limit=5" at 16:48:55 Tue Mar 25 2025
+GET "/favicon.ico" at 15:55:21 Mon Apr 07 2025
+GET "/api?page=1&limit=5" at 15:56:18 Mon Apr 07 2025
+GET "/api?page=2&limit=5" at 15:56:19 Mon Apr 07 2025
+GET "/api?page=1&limit=5" at 15:56:20 Mon Apr 07 2025
