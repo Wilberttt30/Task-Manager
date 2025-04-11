@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <input type="text" id="registerUsername" placeholder="Username">
+    <input type="password" id="registerPassword" placeholder="Password">
+    <button type="submit" id="submit">Submit</button>
+    <p id="error"></p>
+    <p>Already have an account? <a href="./login">Login</a></p>
+
+    <script>
+        const username = document.getElementById('registerUsername')
+        const password = document.getElementById('registerPassword')
+        const submit = document.getElementById('submit')
+        const error = document.getElementById('error')
+
+        submit.addEventListener('click', async (e) => {
+            e.preventDefault()
+            const response = await fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username.value,
+                    password: password.value
+                })
+            })
+            const result = await response.json()
+            if (response.status == 400) {
+                error.innerHTML = result.err
+            } else if (response.status === 409) {
+                error.innerHTML = result.err
+            } else {
+                location.replace('./')
+            }
+        })
+    </script>
+</body>
+</html>

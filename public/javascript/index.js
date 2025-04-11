@@ -1,11 +1,12 @@
 const container = document.getElementById('container')
 const pagination = document.getElementById('pagination')
+const user = document.getElementById('greetUser')
 
 const template = `
     <div class='item'>
         <input type="checkbox" id="{id}" {checked}>
         <p id="status">{taskName}</p>
-        <a href="edit.html?editID={editID}">Edit</a>
+        <a href="edit?editID={editID}">Edit</a>
         <button id="delete{ID}">Delete</button>
     </div>
 `
@@ -24,6 +25,8 @@ async function fetchApi() {
     // Show Task
     const tasks = result.task.results
     console.log(tasks)
+
+    user.innerHTML = `Hello ${result.user.username}`
 
     const notedID = []
     tasks.map((task) => {
