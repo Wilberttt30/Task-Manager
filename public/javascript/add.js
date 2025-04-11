@@ -18,8 +18,8 @@ addBtn.addEventListener('click', async (e) => {
     console.log(response)
     const result = await response.json()
     console.log(result)
-    if (result.status === 406) {
-        error.innerHTML = result.error
+    if (response.status === 406) {
+        error.innerHTML = result.err
     } else {
         location.replace('./')
     }

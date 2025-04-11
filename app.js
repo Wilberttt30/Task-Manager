@@ -51,14 +51,19 @@ function idValidation(req, res, next) {
 }
 
 function formValidation(req, res, next) {
-    if (typeof req.body === 'object' && !Array.isArray(req.body)) {
-        const { task } = req.body
-        if( !task ) return res.json({status: 406, error: 'Field must be filled!'})
-        if ( task.length > 10 ) return res.json({status: 406, error: 'Field must not exceed 10 characters'})
-        return next()
+    const { task } = req.body
+
+    if (task == undefined) {
+        return res.status(406).json({err: 'task required'})
+    } else if (typeof task !== 'string') {
+        return res.status(406).json({err: 'task type must be string'})
+    } else if (task.length == 0) {
+        return res.status(406).json({err: 'Task field must be filled!'})
+    } else if (task.length > 10) {
+        return res.status(406).json({err: 'Field must not exceed 10 characters long'})
     } else {
-        res.json({error: 'Invalid JSON'})
-    } 
+        return next()
+    }
 }
 
 async function auth(req, res, next) {
@@ -80,25 +85,32 @@ async function auth(req, res, next) {
 }
 
 function userInfoNotEmpty(req, res, next) {
-    if ((typeof req.body === 'object' && !Array.isArray(req.body))) {
-        const { username, password } = req.body
-        if (username == "" || password == "") return res.status(400).json({err: 'Field must be filled!'})
-        if (typeof username === 'number' || typeof password === 'number') return res.json({err: 'Must be a String'})
-        return next()
+    const { username, password } = req.body
+    // Username and password validation
+    if (username == undefined || password == undefined) {
+        return res.status(406).json({err: 'Username or password required!'})
+    } else if (typeof username !== 'string' || typeof password !== 'string') { 
+        return res.status(406).json({err: 'Username or password type must be string!'})
+    } else if (username == "" || password == "") {
+        return res.status(406).json({err: 'Username or password field must be filled!'})
     } else {
-        return res.status(400).json({err: 'Invalid JSON!'})
+        return next()
     }
 }
 
 function statusTaskValidation(req, res, next) {
     const statusTask = req.body.statusTask
-    if (!statusTask || Array.isArray(statusTask) || statusTask == null || statusTask.length == 0 || typeof statusTask === 'object') {
-        req.body.statusTask = false
+    if (statusTask === undefined) {
+        return res.status(406).json({err: 'statusTask required!'})
+    } else if (typeof statusTask !== 'boolean') {
+        return res.status(406).json({err: 'Type is not boolean'})
+    } else {
+        return next()
     }
-    next()
 }
 
-const taskRouter = require('./routes/task')
+const taskRouter = require('./routes/task');
+const { type } = require('os');
 app.use('/', taskRouter)
 
 app.post('/register', userInfoNotEmpty, async (req, res) => {
