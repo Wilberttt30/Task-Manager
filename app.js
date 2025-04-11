@@ -83,6 +83,7 @@ function userInfoNotEmpty(req, res, next) {
     if ((typeof req.body === 'object' && !Array.isArray(req.body))) {
         const { username, password } = req.body
         if (username == "" || password == "") return res.status(400).json({err: 'Field must be filled!'})
+        if (typeof username === 'number' || typeof password === 'number') return res.json({err: 'Must be a String'})
         return next()
     } else {
         return res.status(400).json({err: 'Invalid JSON!'})
@@ -90,7 +91,8 @@ function userInfoNotEmpty(req, res, next) {
 }
 
 function statusTaskValidation(req, res, next) {
-    if (!req.body.statusTask) {
+    const statusTask = req.body.statusTask
+    if (!statusTask || Array.isArray(statusTask) || statusTask == null || statusTask.length == 0 || typeof statusTask === 'object') {
         req.body.statusTask = false
     }
     next()
@@ -144,7 +146,6 @@ app.post('/login', userInfoNotEmpty, async (req, res) => {
 })
 
 app.get('/api', queryParams, auth, async (req, res) => {
-    const user = req.user
     const id = req.user.id
     const page = parseInt(req.query.page)
     const limit = parseInt(req.query.limit)
@@ -182,7 +183,12 @@ app.get('/api', queryParams, auth, async (req, res) => {
     }
     
     result.results = allTask
-    res.status(200).json({ msg: 'Successfully Fetch Data', task: result, user: user })
+    res.status(200).json({ msg: 'Successfully Fetch Data', task: result })
+})
+
+app.get('/api/user', auth, (req, res) => {
+    const user = req.user.username
+    res.status(200).json({user: user})
 })
 
 app.post('/api', auth, formValidation, async (req, res) => {

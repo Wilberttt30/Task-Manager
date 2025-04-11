@@ -20,13 +20,13 @@ async function fetchApi() {
 
     // Fetch API
     const response = await fetch(`http://localhost:3000/api?page=${page}&limit=${limit}`, { method: 'GET' })
+    const responseUser = await fetch('http://localhost:3000/api/user')
     const result = await response.json()
-    console.log(result)
+    const resultUser = await responseUser.json()
     // Show Task
     const tasks = result.task.results
-    console.log(tasks)
 
-    user.innerHTML = `Hello ${result.user.username}`
+    user.innerHTML = `Hello ${resultUser.user}`
 
     const notedID = []
     tasks.map((task) => {
